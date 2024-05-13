@@ -55,11 +55,14 @@ def launch_setup(context, *args, **kwargs):
     controllers_file = LaunchConfiguration("controllers_file")
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
-    prefix = LaunchConfiguration("prefix")
+    tf_prefix = LaunchConfiguration("tf_prefix")
     start_joint_controller = LaunchConfiguration("start_joint_controller")
     initial_joint_controller = LaunchConfiguration("initial_joint_controller")
     launch_rviz = LaunchConfiguration("launch_rviz")
     gazebo_gui = LaunchConfiguration("gazebo_gui")
+    x = LaunchConfiguration("x")
+    y = LaunchConfiguration("y")
+    z = LaunchConfiguration("z")
 
     initial_joint_controllers = PathJoinSubstitution(
         [FindPackageShare(runtime_config_package), "config", controllers_file]
@@ -92,8 +95,8 @@ def launch_setup(context, *args, **kwargs):
             "ur_type:=",
             ur_type,
             " ",
-            "prefix:=",
-            prefix,
+            "tf_prefix:=",
+            tf_prefix,
             " ",
             "sim_gazebo:=true",
             " ",
@@ -122,7 +125,7 @@ def launch_setup(context, *args, **kwargs):
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["arm_1_joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
     # Delay rviz start after `joint_state_broadcaster`
@@ -162,7 +165,8 @@ def launch_setup(context, *args, **kwargs):
         package="gazebo_ros",
         executable="spawn_entity.py",
         name="spawn_ur",
-        arguments=["-entity", "ur", "-topic", "robot_description"],
+        arguments=["-entity", "ur1", "-topic", "robot_description",
+                   '-x', x, '-y', y, '-z', z],
         output="screen",
     )
 
@@ -172,7 +176,7 @@ def launch_setup(context, *args, **kwargs):
         delay_rviz_after_joint_state_broadcaster_spawner,
         initial_joint_controller_spawner_stopped,
         initial_joint_controller_spawner_started,
-        gazebo,
+        # gazebo,
         gazebo_spawn_robot,
     ]
 
@@ -187,7 +191,7 @@ def generate_launch_description():
             "ur_type",
             description="Type/series of used UR robot.",
             choices=["ur3", "ur3e", "ur5", "ur5e", "ur10", "ur10e", "ur16e", "ur20", "ur30"],
-            default_value="ur5e",
+            default_value="ur10e",
         )
     )
     declared_arguments.append(
@@ -244,9 +248,9 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            "prefix",
+            "tf_prefix",
             default_value='""',
-            description="Prefix of the joint names, useful for \
+            description="tf_prefix of the joint names, useful for \
         multi-robot setup. If changed than also joint names in the controllers' configuration \
         have to be updated.",
         )
@@ -261,7 +265,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "initial_joint_controller",
-            default_value="joint_trajectory_controller",
+            default_value="arm_1_joint_trajectory_controller",
             description="Robot controller to start.",
         )
     )
@@ -272,6 +276,15 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "gazebo_gui", default_value="true", description="Start gazebo with GUI?"
         )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument("x", default_value="0", description="X position of the robot")
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument("y", default_value="0", description="Y position of the robot")
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument("z", default_value="0", description="Z position of the robot")
     )
 
     return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
