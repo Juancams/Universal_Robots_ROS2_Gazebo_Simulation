@@ -60,6 +60,10 @@ def launch_setup(context, *args, **kwargs):
     initial_joint_controller = LaunchConfiguration("initial_joint_controller")
     launch_rviz = LaunchConfiguration("launch_rviz")
     gazebo_gui = LaunchConfiguration("gazebo_gui")
+    x = LaunchConfiguration("x")
+    y = LaunchConfiguration("y")
+    z = LaunchConfiguration("z")
+    namespace = "/arm1"
 
     initial_joint_controllers = PathJoinSubstitution(
         [FindPackageShare(runtime_config_package), "config", controllers_file]
@@ -99,6 +103,9 @@ def launch_setup(context, *args, **kwargs):
             " ",
             "simulation_controllers:=",
             initial_joint_controllers,
+            " ",
+            "namespace:=",
+            namespace
         ]
     )
     robot_description = {"robot_description": robot_description_content}
@@ -107,6 +114,7 @@ def launch_setup(context, *args, **kwargs):
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
+        namespace=namespace,
         parameters=[{"use_sim_time": True}, robot_description],
     )
 
@@ -115,6 +123,7 @@ def launch_setup(context, *args, **kwargs):
         executable="rviz2",
         name="rviz2",
         output="log",
+        namespace=namespace,
         arguments=["-d", rviz_config_file],
         condition=IfCondition(launch_rviz),
     )
@@ -122,7 +131,7 @@ def launch_setup(context, *args, **kwargs):
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster", "--controller-manager", namespace + "/controller_manager"],
     )
 
     # Delay rviz start after `joint_state_broadcaster`
@@ -137,13 +146,13 @@ def launch_setup(context, *args, **kwargs):
     initial_joint_controller_spawner_started = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[initial_joint_controller, "-c", "/controller_manager"],
+        arguments=[initial_joint_controller, "-c", namespace + "/controller_manager"],
         condition=IfCondition(start_joint_controller),
     )
     initial_joint_controller_spawner_stopped = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[initial_joint_controller, "-c", "/controller_manager", "--stopped"],
+        arguments=[initial_joint_controller, "-c", namespace + "/controller_manager", "--stopped"],
         condition=UnlessCondition(start_joint_controller),
     )
 
@@ -162,7 +171,9 @@ def launch_setup(context, *args, **kwargs):
         package="gazebo_ros",
         executable="spawn_entity.py",
         name="spawn_ur",
-        arguments=["-entity", "ur", "-topic", "robot_description"],
+        arguments=["-entity", "ur", "-topic", namespace + "/robot_description",
+                   "-x", x, "-y", y, "-z", z,
+                   "-robot_namespace", namespace],
         output="screen",
     )
 
@@ -271,6 +282,21 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "gazebo_gui", default_value="true", description="Start gazebo with GUI?"
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "x", default_value="0", description="Initial x position of the robot."
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "y", default_value="0", description="Initial y position of the robot."
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "z", default_value="0", description="Initial z position of the robot."
         )
     )
 

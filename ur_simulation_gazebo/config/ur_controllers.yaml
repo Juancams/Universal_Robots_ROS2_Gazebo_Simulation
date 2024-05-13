@@ -1,4 +1,4 @@
-controller_manager:
+/**/controller_manager:
   ros__parameters:
 
     update_rate: 100 # Hz
@@ -47,7 +47,7 @@ force_torque_sensor_broadcaster:
     topic_name: ft_data
 
 
-joint_trajectory_controller:
+/**/joint_trajectory_controller:
   ros__parameters:
     joints:
       - shoulder_pan_joint
