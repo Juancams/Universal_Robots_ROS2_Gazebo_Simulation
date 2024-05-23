@@ -172,6 +172,7 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     declared_arguments = []
+    runtime_config_package = LaunchConfiguration("runtime_config_package")
     # UR specific arguments
     declared_arguments.append(
         DeclareLaunchArgument(
@@ -231,6 +232,12 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "gazebo_gui", default_value="true", description="Start gazebo with GUI?"
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "world", default_value=[PathJoinSubstitution(
+            [FindPackageShare(runtime_config_package), "worlds",  "lab.sdf"])], description="World file to load in Gazebo"
         )
     )
 
