@@ -80,12 +80,12 @@ ur5_forward_velocity_controller:
 ur5_forward_position_controller:
   ros__parameters:
     joints:
-      - shoulder_pan_joint
-      - shoulder_lift_joint
-      - elbow_joint
-      - wrist_1_joint
-      - wrist_2_joint
-      - wrist_3_joint
+      - ur5_shoulder_pan_joint
+      - ur5_shoulder_lift_joint
+      - ur5_elbow_joint
+      - ur5_wrist_1_joint
+      - ur5_wrist_2_joint
+      - ur5_wrist_3_joint
 
 ur10_joint_trajectory_controller:
   ros__parameters:
@@ -96,6 +96,7 @@ ur10_joint_trajectory_controller:
       - ur10_wrist_1_joint
       - ur10_wrist_2_joint
       - ur10_wrist_3_joint
+      - ur10_rail_joint
     command_interfaces:
       - position
     state_interfaces:
@@ -113,6 +114,7 @@ ur10_joint_trajectory_controller:
       ur10_wrist_1_joint: { trajectory: 0.2, goal: 0.1 }
       ur10_wrist_2_joint: { trajectory: 0.2, goal: 0.1 }
       ur10_wrist_3_joint: { trajectory: 0.2, goal: 0.1 }
+      ur10_rail_joint: { trajectory: 0.2, goal: 0.1 }
 
 ur10_forward_velocity_controller:
   ros__parameters:
@@ -123,14 +125,16 @@ ur10_forward_velocity_controller:
       - ur10_wrist_1_joint
       - ur10_wrist_2_joint
       - ur10_wrist_3_joint
+      - ur10_rail_joint
     interface_name: velocity
 
 ur10_forward_position_controller:
   ros__parameters:
     joints:
-      - shoulder_pan_joint
-      - shoulder_lift_joint
-      - elbow_joint
-      - wrist_1_joint
-      - wrist_2_joint
-      - wrist_3_joint
+      - ur10_shoulder_pan_joint
+      - ur10_shoulder_lift_joint
+      - ur10_elbow_joint
+      - ur10_wrist_1_joint
+      - ur10_wrist_2_joint
+      - ur10_wrist_3_joint
+      - ur10_rail_joint
